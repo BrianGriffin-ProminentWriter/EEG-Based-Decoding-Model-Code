@@ -15,7 +15,7 @@ class Main_Model_SSID(nn.Module):
         self.conv2 = nn.Conv2d(1, 1, (1, 1))
         self.class_pic = nn.Linear(4096, 2048)
         self.class_ima = nn.Linear(4096, 2048)
-        self.capsnet = CapsuleNet([2, 1, 2048], 3, 3)
+        self.capsnet_with_conv = CapsuleNet([2, 1, 2048], 3, 3)
         self.loss_weight = nn.Parameter(torch.tensor(0.5))
 
     def forward(self, x):
@@ -56,6 +56,7 @@ class Main_Model_SSID(nn.Module):
         img_out = torch.unsqueeze(self.class_ima(x_img_all), dim=1)
 
         out = torch.unsqueeze(torch.cat((per_out, img_out), dim=1), dim=2)
-        out, caps_loss = self.capsnet(out)
+        out, caps_loss = self.capsnet_with_conv(out)
 
         return out, caps_loss, 0.1 * (0.5 * Per_kl + 0.5 * Img_kl)
+
